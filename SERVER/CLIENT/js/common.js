@@ -40194,34 +40194,26 @@
 
 	          _this2.props.dispatch((0, _actions.initGL)(gl, Module, Bindings));
 
-	          var repaintThrottle = function () {
-	            var repaintTimeout = void 0;
-	            return function () {
-	              if (!repaintTimeout) {
-	                repaintTimeout = setTimeout(function () {
-	                  repaintTimeout = null;
-	                  _this2.setState({
-	                    width: document.body.clientWidth,
-	                    height: document.body.clientHeight
-	                  });
+	          var repaint = function repaint() {
+	            _this2.setState({
+	              width: document.body.clientWidth,
+	              height: document.body.clientHeight
+	            });
 
-	                  gl.disable(gl.SCISSOR_TEST);
-	                  gl.clearColor(0, 0, 0, 0);
-	                  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	                  gl.lastViewport = null;
+	            gl.disable(gl.SCISSOR_TEST);
+	            gl.clearColor(0, 0, 0, 0);
+	            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	            gl.lastViewport = null;
 
-	                  var ev = new CustomEvent('glCleared', {});
-	                  _this2.refs.canvas.dispatchEvent(ev);
-	                }, 16);
-	              }
-	            };
-	          }();
+	            var ev = new CustomEvent('glCleared', {});
+	            _this2.refs.canvas.dispatchEvent(ev);
+	          };
 
 	          document.addEventListener('splitterResize', function (ev) {
-	            repaintThrottle();
+	            requestAnimationFrame(repaint);
 	          });
 	          window.addEventListener('resize', function (ev) {
-	            repaintThrottle();
+	            requestAnimationFrame(repaint);
 	          });
 	        }
 	      };

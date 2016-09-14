@@ -48,34 +48,26 @@ class Canvas extends React.Component {
 
         this.props.dispatch(initGL(gl, Module, Bindings))
 
-        let repaintThrottle = (() => {
-          let repaintTimeout
-          return () => {
-            if (!repaintTimeout) {
-              repaintTimeout = setTimeout(() => {
-                repaintTimeout = null;
-                this.setState({
-                  width: document.body.clientWidth,
-                  height: document.body.clientHeight
-                })
+        let repaint = () => {
+          this.setState({
+            width: document.body.clientWidth,
+            height: document.body.clientHeight
+          })
 
-                gl.disable(gl.SCISSOR_TEST)
-                gl.clearColor(0,0,0,0)
-                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-                gl.lastViewport = null
+          gl.disable(gl.SCISSOR_TEST)
+          gl.clearColor(0,0,0,0)
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+          gl.lastViewport = null
 
-                let ev = new CustomEvent('glCleared', {})
-                this.refs.canvas.dispatchEvent(ev)
-              }, 16)
-            }
-          }
-        })()
+          let ev = new CustomEvent('glCleared', {})
+          this.refs.canvas.dispatchEvent(ev)
+        }
 
         document.addEventListener('splitterResize', function(ev) {
-          repaintThrottle()  
+          requestAnimationFrame(repaint)  
         })
         window.addEventListener('resize', (ev) => {
-          repaintThrottle()
+          requestAnimationFrame(repaint)
         })
       }
     }
