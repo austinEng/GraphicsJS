@@ -1,0 +1,17 @@
+
+.component-wrapper {
+  display: block;
+  // position: relative;
+  background-color: #181818;
+  // margin: 5px;
+  padding: 10px;
+  box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+  // max-height: 100%;
+  // max-width: 100%;
+  // overflow: hidden;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  bottom: 5px;
+  right: 5px;
+}

@@ -1,0 +1,111 @@
+
+.layout {
+  display: flex;
+  position: relative;
+  flex: auto;
+  flex-wrap: nowrap;
+  align-items: stretch;
+
+  &.horizontal {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  &.vertical {
+    flex-direction: column;
+    height: 100%;
+  }
+}
+
+.central-window {
+
+}
+
+.layout-item {
+  flex: auto;
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+$edge-target-size: 12px;
+$edge-display-size: 2px;
+
+.splitter {
+  display: block;
+  position: relative;
+  width: 0;
+  height: 0;
+  left: 0;
+  top: 0;
+  z-index: 2;
+}
+
+.splitter-target {
+  position: absolute;
+
+  &:after {
+    position: absolute;
+    display: block;
+    content: '';
+  }
+
+  &:hover:after {
+    background-color: #888;
+  }
+  &:focus:after, &:active:after, &.active:after {
+    background-color: #ccc;
+  }
+}
+
+.panel-layout {
+  &.horizontal {
+    .splitter {
+      width: 0;
+      height: 100%;
+    }
+
+    .splitter-target {
+      left: -$edge-target-size / 2;
+      top: 0px;
+      height: 100%;
+      width: $edge-target-size;
+
+      &:hover, &.active {
+        cursor: col-resize;
+      }
+      &:after {
+        left: ($edge-target-size - $edge-display-size) / 2;
+        right: ($edge-target-size - $edge-display-size) / 2;
+        top: 0px;
+        height: 100%;
+        width: auto;
+      }
+    }
+  }
+
+  &.vertical {
+    .splitter {
+      width: 100%;
+      height: 0;
+    }
+
+    .splitter-target {
+      top: -$edge-target-size / 2;
+      left: 0px;
+      width: 100%;
+      height: $edge-target-size;
+
+      &:hover, &.active {
+        cursor: row-resize;
+      }
+      &:after {
+        top: ($edge-target-size - $edge-display-size) / 2;
+        bottom: ($edge-target-size - $edge-display-size) / 2;
+        left: 0px;
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+}
