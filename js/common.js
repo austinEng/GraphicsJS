@@ -39801,7 +39801,7 @@
 	var Module = exports.Module = {};
 
 	var canvasScriptLoaded = new Promise(function (resolve, reject) {
-	  _superagent2.default.get('/emscripten/canvas.js').end(function (err, res) {
+	  _superagent2.default.get('emscripten/canvas.js').end(function (err, res) {
 	    if (err) return reject(err);
 	    return resolve(res.text);
 	  });
