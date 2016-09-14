@@ -3,8 +3,9 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import App from './components/app.jsx'
 import configureStore from './configureStore'
-const store = configureStore(window.__PRELOADED_STATE__)
+import layout from './layouts/default'
 
+const store = configureStore(layout)
 console.log('INITIAL STATE:', store.getState())
 
 render(

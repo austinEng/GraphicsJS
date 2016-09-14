@@ -4,4 +4,3 @@ node_modules
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
-SERVER/CLIENT

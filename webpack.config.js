@@ -5,14 +5,14 @@ var path = require('path')
 module.exports = {
 
   entry: {
-    '/components/viewport': ['./SERVER/src/components/viewport.jsx'],
-    '/components/centralWindow': ['./SERVER/src/components/central-window.jsx'],
-    '/components/layout': ['./SERVER/src/components/layout.jsx'],
-    '/components/app': ['./SERVER/src/components/app.jsx'],
-    'index': './SERVER/src/index.jsx'
+    '/components/viewport': ['./src/components/viewport.jsx'],
+    '/components/centralWindow': ['./src/components/central-window.jsx'],
+    '/components/layout': ['./src/components/layout.jsx'],
+    '/components/app': ['./src/components/app.jsx'],
+    'index': './src/index.jsx',
   },
   output: {
-    path: './SERVER/CLIENT/js',
+    path: './CLIENT/js',
     filename: '[name].js'
   },
   module: {
@@ -28,7 +28,7 @@ module.exports = {
     ]
   },
   sassLoader: {
-    includePaths: [path.resolve(__dirname, "./SERVER/CLIENT/src/style")]
+    includePaths: [path.resolve(__dirname, "./src/style")]
   },
   resolve: {
     extensions: ['.jsx', '.js', '']

@@ -17,4 +17,4 @@ canvas: $(SOURCES)
 	$(CC) $(SOURCES) --bind -s NO_EXIT_RUNTIME=1 -s FULL_ES2=1 -s EXPORTED_FUNCTIONS=@canvas_exports.txt -std=c++11 -o build/canvas.js
 
 install:
-	cp build/* ../SERVER/CLIENT/emscripten/
+	cp build/* ../CLIENT/emscripten/
