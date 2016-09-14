@@ -9,7 +9,7 @@ export const Bindings = {}
 export var Module = {}
 
 var canvasScriptLoaded = new Promise((resolve, reject) => {
-  request.get('/emscripten/canvas.js').end((err, res) => {
+  request.get('emscripten/canvas.js').end((err, res) => {
     if (err) return reject(err)
     return resolve(res.text)
   })
