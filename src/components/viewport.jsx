@@ -4,6 +4,8 @@ import io from 'socket.io-client'
 import {glMatrix, mat4} from 'gl-matrix'
 import {Bindings} from './canvas'
 require('../style/viewport.scss')
+import {glInitialized} from './canvas'
+import classnames from 'classnames'
 
 class Viewport extends React.Component {
   constructor(props) {
@@ -11,11 +13,11 @@ class Viewport extends React.Component {
     this.displayName = 'Viewport';
   }
 
-  componentWillReceiveProps(nextProps) {
+  /*componentWillReceiveProps(nextProps) {
     if (nextProps.gl && !this.props.gl) {
       this.glInitialized(nextProps.gl)
     }
-  }
+  }*/
 
   componentDidMount() {
     // let socket = io(this.props.address)
@@ -28,12 +30,22 @@ class Viewport extends React.Component {
     // socket.on('disconnect', () =>
     //   console.log('Disconnected from viewport server')
     // )
+    // if (this.props.gl) {
+    //   this.glInitialized(this.props.gl)
+    // }
+    this.draw = this.draw.bind(this)
+    glInitialized.then(() => {
+      const {gl} = this.props
+      this.draw()
+      // process.nextTick(this.draw)
+      gl.canvas.addEventListener('glCleared', this.draw)
+    })
   }
 
-  glInitialized(gl) {
-    process.nextTick(this.draw.bind(this))
-    gl.canvas.addEventListener('glCleared', (ev) => {
-      this.draw()
+  componentWillUnmount() {
+    const {gl} = this.props
+    glInitialized.then(() => {
+      gl.canvas.removeEventListener('glCleared', this.draw)
     })
   }
   
@@ -41,7 +53,6 @@ class Viewport extends React.Component {
     const {gl, Bindings} = this.props
     // gl.enable(gl.DEPTH_TEST)
     // gl.enable(gl.SCISSOR_TEST)
-
     let rect = this.refs.viewport.getBoundingClientRect()
     // gl.scissor(rect.left, document.body.clientHeight - rect.top - rect.height, rect.width, rect.height)
     // gl.viewport(rect.left, document.body.clientHeight - rect.top - rect.height, rect.width, rect.height)
@@ -79,9 +90,14 @@ class Viewport extends React.Component {
   }
 
   render() {
+    let classes = classnames({
+      'viewport': true, 
+      'no-aspect': !this.props.aspectRatio
+    })
+
     return (
       <div className='component-wrapper'>
-        <div ref="viewport" className='viewport' style={{'padding': this._padding }}></div>
+        <div ref="viewport" className={classes} style={{'padding': this._padding }}></div>
       </div>
     );
   }
@@ -89,12 +105,12 @@ class Viewport extends React.Component {
 
 Viewport.propTypes = {
   address: React.PropTypes.string,
-  aspectRatio: React.PropTypes.number.isRequired,
+  // aspectRatio: React.PropTypes.number.isRequired,
   gl: React.PropTypes.object
 }
 
 Viewport.defaultProps = {
-  aspectRatio: 1
+  // aspectRatio: 1
 }
 
 function mapStateToProps(state, ownProps) {

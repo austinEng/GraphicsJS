@@ -34,14 +34,9 @@ class PanelLayout extends Layout {
         let leftComponent = this.refs[`child.${left}`].refs.target
         let rightComponent = this.refs[`child.${right}`].refs.target
 
-        let ev = new CustomEvent('splitterResize', {
-          detail: {
-            leftComponent,
-            rightComponent
-          }
-        })
+        let ev = new CustomEvent('splitterResize', {})
         document.dispatchEvent(ev)
-        
+
         leftComponent.setState({
           widthOffset: x,
           heightOffset: y

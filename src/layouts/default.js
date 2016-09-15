@@ -41,10 +41,10 @@ module.exports = {
       aspectRatio: 16/9,
     },
     4: {
-      aspectRatio: 1,
+      // aspectRatio: 1,
     },
     5: {
-      aspectRatio: 4/3,
+      // aspectRatio: 4/3,
     }
   }
 }

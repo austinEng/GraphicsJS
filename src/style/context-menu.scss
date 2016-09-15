@@ -1,0 +1,31 @@
+
+.context-menu {
+  display: block;
+  color: white;
+  z-index: 20;
+
+  .context-menu-item {
+    position: relative;
+    padding: 4px 15px;
+    cursor: pointer;
+    &:hover {
+      background-color: green;
+      & > .context-menu-list {
+        display: block;
+      }
+    }
+  }
+
+  .context-menu-list {
+    display: none;
+    position: absolute;
+    background-color: #222;
+    box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.75);
+    top: 0px;
+    left: 100%;
+  }
+
+  & > .context-menu-list {
+    display: block;
+  }
+}

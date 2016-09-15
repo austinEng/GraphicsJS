@@ -7,7 +7,7 @@ webpackJsonp([4],{
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(70);
+	var _reactDom = __webpack_require__(65);
 
 	var _reactRedux = __webpack_require__(36);
 
@@ -15,11 +15,11 @@ webpackJsonp([4],{
 
 	var _app2 = _interopRequireDefault(_app);
 
-	var _configureStore = __webpack_require__(289);
+	var _configureStore = __webpack_require__(292);
 
 	var _configureStore2 = _interopRequireDefault(_configureStore);
 
-	var _default = __webpack_require__(293);
+	var _default = __webpack_require__(296);
 
 	var _default2 = _interopRequireDefault(_default);
 
@@ -36,7 +36,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 289:
+/***/ 292:
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -46,15 +46,15 @@ webpackJsonp([4],{
 
 	var _redux = __webpack_require__(43);
 
-	var _reduxThunk = __webpack_require__(290);
+	var _reduxThunk = __webpack_require__(293);
 
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-	var _reduxLogger = __webpack_require__(291);
+	var _reduxLogger = __webpack_require__(294);
 
 	var _reduxLogger2 = _interopRequireDefault(_reduxLogger);
 
-	var _reducers = __webpack_require__(292);
+	var _reducers = __webpack_require__(295);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -83,7 +83,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 290:
+/***/ 293:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -112,7 +112,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 291:
+/***/ 294:
 /***/ function(module, exports) {
 
 	"use strict";
@@ -346,7 +346,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 292:
+/***/ 295:
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -357,7 +357,7 @@ webpackJsonp([4],{
 
 	var _redux = __webpack_require__(43);
 
-	var _actions = __webpack_require__(64);
+	var _actions = __webpack_require__(209);
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	// export function graphicsApp(state = {}, action) {
@@ -468,6 +468,64 @@ webpackJsonp([4],{
 	        }
 	      }
 	      return nextState;
+	    case _actions.SPLIT_VIEW:
+	      var nState = Object.assign({}, state);
+
+	      var id = Object.keys(state.classes).length;
+	      while (nState.classes[id]) {
+	        id += 1;
+	      }nState.classes[id] = action.layout;
+
+	      var id2 = id + 1;
+	      while (nState.classes[id2]) {
+	        id2 += 1;
+	      }nState.classes[id2] = nState.classes[action.id];
+	      nState.children[id] = [action.id, id2];
+	      nState.sizes[id] = nState.sizes[action.id];
+	      nState.sizes[id2] = nState.sizes[action.id] = {
+	        width: nState.sizes[action.id].width / 2,
+	        height: nState.sizes[action.id].height / 2
+	      };
+	      var nSizes = recursiveDistribute(nState, _defineProperty({}, id, nState.sizes[id]), id);
+	      for (var _newSize in nSizes) {
+	        if (nState.sizes.hasOwnProperty(_newSize)) {
+	          Object.assign(nState.sizes[_newSize], nSizes[_newSize]);
+	        } else {
+	          nState.sizes[_newSize] = nSizes[_newSize];
+	        }
+	      }
+
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = Object.keys(nState.children)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var key = _step.value;
+
+	          for (var i in nState.children[key]) {
+	            if (nState.children[key][i] == action.id) {
+	              nState.children[key][i] = id;
+	              return nState;
+	            }
+	          }
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+
+	      return nState;
 	    default:
 	      return state;
 	  }
@@ -514,7 +572,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 293:
+/***/ 296:
 /***/ function(module, exports, __webpack_require__) {
 
 	var _utils = __webpack_require__(59);
@@ -560,10 +618,10 @@ webpackJsonp([4],{
 	      aspectRatio: 16 / 9
 	    },
 	    4: {
-	      aspectRatio: 1
+	      // aspectRatio: 1,
 	    },
 	    5: {
-	      aspectRatio: 4 / 3
+	      // aspectRatio: 4/3,
 	    }
 	  }
 	};

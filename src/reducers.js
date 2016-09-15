@@ -5,7 +5,7 @@
 import {Types} from './components/utils' 
 
 import { combineReducers } from 'redux'
-import {SET_SIZES, DISTRIBUTE_SIZES} from './actions'
+import {SET_SIZES, DISTRIBUTE_SIZES, SPLIT_VIEW} from './actions'
 import {INIT_GL} from './actions'
 
 function sizes(state = {}, action) {
@@ -103,6 +103,41 @@ function reduceLayout(state, action) {
         }
       }
       return nextState
+    case SPLIT_VIEW:
+      const nState = Object.assign({}, state)
+      
+      let id = Object.keys(state.classes).length
+      while(nState.classes[id]) id += 1
+      nState.classes[id] = action.layout
+      
+      let id2 = id + 1
+      while (nState.classes[id2]) id2 += 1
+      nState.classes[id2] = nState.classes[action.id]
+      nState.children[id] = [action.id, id2]
+      nState.sizes[id] = nState.sizes[action.id]
+      nState.sizes[id2] = nState.sizes[action.id] = {
+        width: nState.sizes[action.id].width / 2,
+        height: nState.sizes[action.id].height / 2
+      }
+      const nSizes = recursiveDistribute(nState, { [id]: nState.sizes[id] }, id)
+      for (let newSize in nSizes) {
+        if (nState.sizes.hasOwnProperty(newSize)) {
+          Object.assign(nState.sizes[newSize], nSizes[newSize])
+        } else {
+          nState.sizes[newSize] = nSizes[newSize]
+        }
+      }
+
+      for (let key of Object.keys(nState.children)) {
+        for (let i in nState.children[key]) {
+          if (nState.children[key][i] == action.id) {
+            nState.children[key][i] = id
+            return nState
+          }
+        }
+      }
+
+      return nState
     default:
       return state
   }

@@ -15,6 +15,11 @@ var canvasScriptLoaded = new Promise((resolve, reject) => {
   })
 })
 
+var onGLInitialized;
+export const glInitialized = new Promise((resolve, reject) => {
+  onGLInitialized = resolve
+})
+
 class Canvas extends React.Component {
   constructor(props) {
     super(props)
@@ -47,6 +52,7 @@ class Canvas extends React.Component {
         gl = Module.canvas.GLctxObject.GLctx
 
         this.props.dispatch(initGL(gl, Module, Bindings))
+        onGLInitialized({gl, Module, Bindings})
 
         let repaint = () => {
           this.setState({

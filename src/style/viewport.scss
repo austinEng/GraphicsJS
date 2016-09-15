@@ -3,5 +3,8 @@
   width: 100%;
   top: 0px;
   left: 0px;
-  // background-color: black;
+
+  &.no-aspect {
+    height: 100%;
+  }
 }

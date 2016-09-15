@@ -1,7 +1,9 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import {getComponentClass} from './utils'
+import {getComponentClass, Types} from './utils'
 import {Direction} from './flags'
+import {spawnContextMenu} from './context-menu'
+import {splitView, setView} from '../actions'
 
 class LayoutItem extends React.Component {
   constructor(props) {
@@ -18,10 +20,55 @@ class LayoutItem extends React.Component {
     }
 
     return (
-      <div style={style} ref='el' className='layout-item'>
+      <div style={style} ref='el' className='layout-item' onContextMenu={this.handleContextMenu.bind(this)}>
         {this.props.children}
       </div>
     )
+  }
+
+  handleContextMenu(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const self = this
+    spawnContextMenu([
+      {
+        name: 'Windows',
+        action: function() {
+          console.log('windows')
+        },
+        children: [
+          {
+            name: 'Viewport',
+            action: function() {
+              self.props.dispatch(setView(self.props.id, Types.Viewport))
+            }
+          },
+          {
+            name: 'Split View',
+            children: [
+              {
+                name: 'Horizontal',
+                action: function() {
+                  self.props.dispatch(splitView(self.props.id, Types.HorizontalPanelLayout))
+                }
+              },
+              {
+                name: 'Vertical',
+                action: function() {
+                  self.props.dispatch(splitView(self.props.id, Types.VerticalPanelLayout))
+                },
+              }
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Settings',
+        action: function() {
+          console.log('settings')
+        }
+      }
+    ], e.clientX, e.clientY)
   }
 
   get size() {
