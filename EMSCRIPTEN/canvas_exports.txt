@@ -1,1 +1,0 @@
-["_initGL", "_clearGL", "_resizeGL", "_drawTriangle", "_scissorViewport"]

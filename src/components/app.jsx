@@ -5,6 +5,8 @@ import {deserializeComponent, getComponentClass} from './utils'
 import Layout from './layout'
 import LayoutItem, {makeLayoutComponent} from './layout-item'
 import Canvas from './canvas'
+import request from 'superagent'
+
 require('../style/app.scss')
 require('../style/layout.scss')
 require('../style/component.scss')
@@ -16,6 +18,18 @@ export const emscriptenLoaded = new Promise((resolve, reject) => {
 })
 export const runtimeInitialized = new Promise((resolve, reject) => {
   onRuntimeInitialized = resolve
+})
+
+export const Module = {
+  'onRuntimeInitialized': () => {
+    onRuntimeInitialized()
+  },
+  TOTAL_MEMORY: 201326592
+}
+
+request.get('emscripten/graphics.js').end((err, res) => {
+  if (err) return console.error(err)
+  eval(`(function(Module) { ${res.text} })(Module);`);
 })
 
 // emscriptenLoaded.then(() => {

@@ -25,6 +25,8 @@ webpackJsonp([4],{
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	__webpack_require__(303);
+
 	var store = (0, _configureStore2.default)(_default2.default);
 	console.log('INITIAL STATE:', store.getState());
 

@@ -3,12 +3,17 @@ import Settings from './settings'
 import {connect} from 'react-redux'
 import ComponentWrapper from './component-wrapper'
 import PropertyField from './property-field'
+import request from 'superagent'
+import {runtimeInitialized} from './app'
+import {Bindings} from '../scene'
 
 export const PORT = 42673
 class ParticleSettings extends Settings {
   constructor(props) {
     super(props)
     this.displayName = 'Particle Settings'
+    this.fluidContainer = null;
+    this.running = false;
   }
 
   render() {
@@ -45,15 +50,35 @@ class ParticleSettings extends Settings {
   }
 
   start() {
+    runtimeInitialized.then(() => {
+      if (!this.fluidContainer) {
+        this.fluidContainer = Bindings.initializeFluidContainer(this.props.sizeX, this.props.sizeY, this.props.sizeZ, this.props.resolution)
+        console.log('Created fluid container', this.fluidContainer)
+      }
+      // Bindings.updateFluidContainer(this.fluidContainer)
+      // console.log('stepped')
+      this.running = true;
+      requestAnimationFrame(this.step.bind(this))
+    })
+  }
 
+  step() {
+    if (!this.fluidContainer || !this.running) return;
+    let d = new Date()
+    Bindings.updateFluidContainer(this.fluidContainer)
+    console.log(new Date() - d)
+    requestAnimationFrame(this.step.bind(this))
   }
 
   stop() {
-
+    this.running = false;
   }
 
   reset() {
-    
+    if (!this.fluidContainer) return;
+    console.log('Destroying fluid container', this.fluidContainer)
+    Bindings.destroyFluidContainer(this.fluidContainer)
+    this.fluidContainer = null
   }
 }
 
