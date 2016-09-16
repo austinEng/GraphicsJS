@@ -15,11 +15,11 @@ webpackJsonp([4],{
 
 	var _app2 = _interopRequireDefault(_app);
 
-	var _configureStore = __webpack_require__(292);
+	var _configureStore = __webpack_require__(298);
 
 	var _configureStore2 = _interopRequireDefault(_configureStore);
 
-	var _default = __webpack_require__(296);
+	var _default = __webpack_require__(302);
 
 	var _default2 = _interopRequireDefault(_default);
 
@@ -36,7 +36,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 292:
+/***/ 298:
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -46,15 +46,15 @@ webpackJsonp([4],{
 
 	var _redux = __webpack_require__(43);
 
-	var _reduxThunk = __webpack_require__(293);
+	var _reduxThunk = __webpack_require__(299);
 
 	var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-	var _reduxLogger = __webpack_require__(294);
+	var _reduxLogger = __webpack_require__(300);
 
 	var _reduxLogger2 = _interopRequireDefault(_reduxLogger);
 
-	var _reducers = __webpack_require__(295);
+	var _reducers = __webpack_require__(301);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -83,7 +83,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 293:
+/***/ 299:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -112,7 +112,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 294:
+/***/ 300:
 /***/ function(module, exports) {
 
 	"use strict";
@@ -346,7 +346,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 295:
+/***/ 301:
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, "__esModule", {
@@ -543,7 +543,12 @@ webpackJsonp([4],{
 	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	  var action = arguments[1];
 
-	  return state;
+	  switch (action.type) {
+	    case _actions.SET_PROP:
+	      return Object.assign({}, state, _defineProperty({}, action.id, _defineProperty({}, action.field, action.value)));
+	    default:
+	      return state;
+	  }
 	}
 
 	function gl() {
@@ -572,7 +577,7 @@ webpackJsonp([4],{
 
 /***/ },
 
-/***/ 296:
+/***/ 302:
 /***/ function(module, exports, __webpack_require__) {
 
 	var _utils = __webpack_require__(59);
@@ -584,45 +589,52 @@ webpackJsonp([4],{
 	    classes: {
 	      0: _utils.Types.CentralWindow,
 	      1: _utils.Types.HorizontalPanelLayout,
-	      2: _utils.Types.VerticalPanelLayout,
-	      3: _utils.Types.Viewport,
+	      // 2: Types.VerticalPanelLayout,
+	      3: _utils.Types.ParticleSettings,
 	      4: _utils.Types.Viewport,
-	      5: _utils.Types.Viewport,
+	      // 5: Types.Viewport,
 	      6: _utils.Types.Canvas
 	    },
 	    sizes: {
-	      2: {
+	      3: {
 	        width: 1
 	      },
-	      3: {
-	        width: 3
-	      },
 	      4: {
-	        height: 4
-	      },
-	      5: {
-	        height: 3
+	        width: 3
 	      }
+	      // 2: {
+	      //   width: 1
+	      // },
+	      // 3: {
+	      //   width: 3
+	      // },
+	      // 4: {
+	      //   height: 4
+	      // },
+	      // 5: {
+	      //   height: 3
+	      // }
 	    },
 	    children: {
 	      0: [1],
-	      1: [2, 3],
-	      2: [4, 5]
+	      1: [3, 4]
+	      // 1: [2, 3],
+	      // 2: [4, 5]
 	    }
 	  },
 	  props: {
-	    0: {
-	      test: 'hi'
-	    },
-	    3: {
-	      aspectRatio: 16 / 9
-	    },
-	    4: {
-	      // aspectRatio: 1,
-	    },
-	    5: {
-	      // aspectRatio: 4/3,
-	    }
+	    // 0: {
+	    //   test: 'hi'
+	    // },
+	    // 3: {
+	    //   aspectRatio: 16/9,
+	    // },
+	    // 4: {
+	    // aspectRatio: 1,
+	    // },
+	    // 5: {
+	    // aspectRatio: 4/3,
+	    // }
 	  }
 	};
 
