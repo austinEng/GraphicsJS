@@ -1,0 +1,50 @@
+.settings {
+  label {
+    color: white;
+    margin-right: 5px;
+    float: left;
+    padding: 5px 0px;
+    height: 30px;
+    margin-top: 5px;
+    max-width: 100%;
+  }
+  input {
+    background-color: #222;
+    border: none;
+    padding: 5px;
+    height: 30px;
+    color: #eee;
+    display: block;
+    float: left;
+    margin-right: 5px;
+    margin-top: 5px;
+    max-width: 100%;
+  }
+  button {
+    background-color: #333;
+    border: none;
+    padding: 5px 10px;
+    height: 30px;
+    color: white;
+    float: left;
+    margin-right: 5px;
+    margin-top: 5px;
+    max-width: 100%;
+    // & + button {
+    //   margin-left: 5px;
+    // }
+  }
+  .form-row {
+    & + .form-row {
+      margin-top: 5px;
+    }
+    &:after {
+      visibility: hidden;
+      display: block;
+      font-size: 0;
+      content: " ";
+      clear: both;
+      height: 0;
+    }
+  }
+}

@@ -6,7 +6,8 @@ const Types = {
   HorizontalLayout: 'HorizontalLayout',
   VerticalLayout: 'VerticalLayout',
   Viewport: 'Viewport',
-  Canvas: 'Canvas'
+  Canvas: 'Canvas',
+  ParticleSettings: 'ParticleSettings'
 }
 
 function getComponentClass(name) {
@@ -25,6 +26,8 @@ function getComponentClass(name) {
       return require('./viewport.jsx').default
     case Types.Canvas:
       return require('./canvas.jsx').default
+    case Types.ParticleSettings:
+      return require('./settings-particle.jsx').default
   }
 }
 

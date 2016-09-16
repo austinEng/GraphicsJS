@@ -6,6 +6,7 @@ import {Bindings} from './canvas'
 require('../style/viewport.scss')
 import {glInitialized} from './canvas'
 import classnames from 'classnames'
+import ComponentWrapper from './component-wrapper'
 
 class Viewport extends React.Component {
   constructor(props) {
@@ -21,7 +22,7 @@ class Viewport extends React.Component {
 
   componentDidMount() {
     // let socket = io(this.props.address)
-    // socket.on('connect', () => 
+    // socket.on('connect', () =>
     //   console.log('Connected to viewport server', this.props.address)
     // )
     // socket.on('connect_error', err =>
@@ -48,7 +49,7 @@ class Viewport extends React.Component {
       gl.canvas.removeEventListener('glCleared', this.draw)
     })
   }
-  
+
   setup() {
     const {gl, Bindings} = this.props
     // gl.enable(gl.DEPTH_TEST)
@@ -73,9 +74,9 @@ class Viewport extends React.Component {
   get rect() {
     let rect = this.refs.viewport.getBoundingClientRect()
     return {
-      left: rect.left, 
-      bottom: document.body.clientHeight - rect.top - rect.height, 
-      width: rect.width, 
+      left: rect.left,
+      bottom: document.body.clientHeight - rect.top - rect.height,
+      width: rect.width,
       height: rect.height
     }
   }
@@ -85,20 +86,20 @@ class Viewport extends React.Component {
     return rect.width / rect.height
   }
 
-  get _padding() { 
+  get _padding() {
     return `0 0 ${100 / this.props.aspectRatio + '%'} 0`
   }
 
   render() {
     let classes = classnames({
-      'viewport': true, 
+      'viewport': true,
       'no-aspect': !this.props.aspectRatio
     })
 
     return (
-      <div className='component-wrapper'>
+      <ComponentWrapper component={this}>
         <div ref="viewport" className={classes} style={{'padding': this._padding }}></div>
-      </div>
+      </ComponentWrapper>
     );
   }
 }

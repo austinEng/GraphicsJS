@@ -39,6 +39,7 @@ class Canvas extends React.Component {
     var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
     Module = {
       canvas,
+      keyboardListeningElement: canvas,
 
       'onRuntimeInitialized': () => {
         Bindings.initGL = Module.cwrap('initGL', 'number', ['number', 'number'])
@@ -70,7 +71,7 @@ class Canvas extends React.Component {
         }
 
         document.addEventListener('splitterResize', function(ev) {
-          requestAnimationFrame(repaint)  
+          requestAnimationFrame(repaint)
         })
         window.addEventListener('resize', (ev) => {
           requestAnimationFrame(repaint)
@@ -81,7 +82,7 @@ class Canvas extends React.Component {
     canvasScriptLoaded.then(js => {
       eval(`(function(Module) { ${js} })(Module);`);
     })
-    
+
   }
 
   render() {

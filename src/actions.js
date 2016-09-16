@@ -4,6 +4,7 @@ export const DISTRIBUTE_SIZES = 'DISTRIBUTE_SIZES'
 export const INIT_GL = 'INIT_GL'
 export const SPLIT_VIEW = 'SPLIT_VIEW'
 export const SET_VIEW = 'SET_VIEW'
+export const SET_PROP = 'SET_PROP'
 
 export function setSizes(sizes) {
   return {type: SET_SIZES, sizes}
@@ -23,4 +24,8 @@ export function splitView(id, layout) {
 
 export function setView(id, cls) {
   return {type: SET_VIEW, id, cls}
+}
+
+export function setProp(id, field, value) {
+  return {type: SET_PROP, id, field, value}
 }

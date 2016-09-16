@@ -2,11 +2,12 @@
 // export function graphicsApp(state = {}, action) {
 //   return state
 // }
-import {Types} from './components/utils' 
+import {Types} from './components/utils'
 
 import { combineReducers } from 'redux'
 import {SET_SIZES, DISTRIBUTE_SIZES, SPLIT_VIEW} from './actions'
 import {INIT_GL} from './actions'
+import {SET_PROP} from './actions'
 
 function sizes(state = {}, action) {
   switch(action.type) {
@@ -48,7 +49,7 @@ function promoteSizeProperty(state, newSizes, id, property) {
   let parentProp = newSizes[id][property]
   if (typeof parentProp === 'undefined') parentProp = sizes[id][property]
   const childIds = children[id]
-  
+
   childIds.forEach((childId, i) => {
     let prop = {
       [property]: parentProp
@@ -63,15 +64,15 @@ function promoteSizeProperty(state, newSizes, id, property) {
 
 function recursiveDistribute(state, newSizes, id) {
   const {children, sizes, classes} = state
-  
+
   const childIds = children[id]
   if (typeof childIds === 'undefined') return newSizes
 
   const nextSizes = Object.assign({}, newSizes)
-  
+
   promoteSizeProperty(state, nextSizes, id, 'width')
   promoteSizeProperty(state, nextSizes, id, 'height')
-  
+
   switch(classes[id]) {
     case Types.HorizontalPanelLayout:
     case Types.HorizontalLayout:
@@ -90,7 +91,7 @@ function recursiveDistribute(state, newSizes, id) {
   return nextSizes
 }
 
-function reduceLayout(state, action) {  
+function reduceLayout(state, action) {
   switch(action.type) {
     case DISTRIBUTE_SIZES:
       const newSizes = recursiveDistribute(state, { [action.id]: action.size }, action.id)
@@ -105,11 +106,11 @@ function reduceLayout(state, action) {
       return nextState
     case SPLIT_VIEW:
       const nState = Object.assign({}, state)
-      
+
       let id = Object.keys(state.classes).length
       while(nState.classes[id]) id += 1
       nState.classes[id] = action.layout
-      
+
       let id2 = id + 1
       while (nState.classes[id2]) id2 += 1
       nState.classes[id2] = nState.classes[action.id]
@@ -145,23 +146,32 @@ function reduceLayout(state, action) {
 
 function layout(state = {}, action) {
   const nextState = Object.assign({}, state, reduceLayout(state, action))
-  return Object.assign({}, 
-    nextState, 
+  return Object.assign({},
+    nextState,
     { sizes: sizes(nextState.sizes, action) }
   )
 }
 
 function props(state = {}, action) {
-  return state
+  switch(action.type) {
+    case SET_PROP:
+      return Object.assign({}, state, {
+        [action.id]: {
+          [action.field]: action.value
+        }
+      })
+    default:
+      return state
+  }
 }
 
 function gl(state = {}, action) {
   switch(action.type) {
     case INIT_GL:
-      return Object.assign({}, state, { 
+      return Object.assign({}, state, {
         context: action.context,
         Module: action.Module,
-        Bindings: action.Bindings 
+        Bindings: action.Bindings
       })
     default:
       return state
