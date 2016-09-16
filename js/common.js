@@ -99,7 +99,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.runtimeInitialized = exports.emscriptenLoaded = undefined;
+	exports.Module = exports.runtimeInitialized = exports.emscriptenLoaded = undefined;
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -123,6 +123,10 @@
 
 	var _canvas2 = _interopRequireDefault(_canvas);
 
+	var _superagent = __webpack_require__(277);
+
+	var _superagent2 = _interopRequireDefault(_superagent);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -136,12 +140,24 @@
 	__webpack_require__(285);
 
 	var onEmscriptenLoaded;
-	var onRuntimeInitialized;
+	var _onRuntimeInitialized;
 	var emscriptenLoaded = exports.emscriptenLoaded = new Promise(function (resolve, reject) {
 	  onEmscriptenLoaded = resolve;
 	});
 	var runtimeInitialized = exports.runtimeInitialized = new Promise(function (resolve, reject) {
-	  onRuntimeInitialized = resolve;
+	  _onRuntimeInitialized = resolve;
+	});
+
+	var Module = exports.Module = {
+	  'onRuntimeInitialized': function onRuntimeInitialized() {
+	    _onRuntimeInitialized();
+	  },
+	  TOTAL_MEMORY: 201326592
+	};
+
+	_superagent2.default.get('emscripten/graphics.js').end(function (err, res) {
+	  if (err) return console.error(err);
+	  eval('(function(Module) { ' + res.text + ' })(Module);');
 	});
 
 	// emscriptenLoaded.then(() => {
@@ -40351,7 +40367,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.glInitialized = exports.Module = exports.Bindings = undefined;
+	exports.glInitialized = exports.Bindings = undefined;
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -40363,11 +40379,11 @@
 
 	var _actions = __webpack_require__(209);
 
-	var _app = __webpack_require__(1);
-
 	var _superagent = __webpack_require__(277);
 
 	var _superagent2 = _interopRequireDefault(_superagent);
+
+	var _app = __webpack_require__(1);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -40378,16 +40394,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	__webpack_require__(282);
-
 	var Bindings = exports.Bindings = {};
-	var Module = exports.Module = {};
-
-	var canvasScriptLoaded = new Promise(function (resolve, reject) {
-	  _superagent2.default.get('emscripten/canvas.js').end(function (err, res) {
-	    if (err) return reject(err);
-	    return resolve(res.text);
-	  });
-	});
 
 	var onGLInitialized;
 	var glInitialized = exports.glInitialized = new Promise(function (resolve, reject) {
@@ -40418,51 +40425,79 @@
 
 
 	      var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-	      exports.Module = Module = {
-	        canvas: canvas,
+	      _app.Module.canvas = canvas;
+	      _app.Module.keyboardListeningElement = canvas;
+	      _app.runtimeInitialized.then(function () {
+	        Bindings.initGL = _app.Module.cwrap('initGL', 'number', ['number', 'number']);
+	        Bindings.drawTriangle = _app.Module.cwrap('drawTriangle', 'number', []);
+	        Bindings.clearGL = _app.Module.cwrap('clearGL', 'number', []);
+	        Bindings.resizeGL = _app.Module.cwrap('resizeGL', 'number', ['number', 'number']);
+	        Bindings.scissorViewport = _app.Module.cwrap('scissorViewport', 'number', ['number', 'number', 'number', 'number']);
+	        if (!Bindings.initGL(document.body.clientWidth, document.body.clientHeight)) {
+	          return;
+	        }
+	        gl = _app.Module.canvas.GLctxObject.GLctx;
+
+	        _this2.props.dispatch((0, _actions.initGL)(gl, _app.Module, Bindings));
+	        onGLInitialized({ gl: gl, Module: _app.Module, Bindings: Bindings });
+
+	        var repaint = function repaint() {
+	          _this2.setState({
+	            width: document.body.clientWidth,
+	            height: document.body.clientHeight
+	          });
+
+	          gl.disable(gl.SCISSOR_TEST);
+	          gl.clearColor(0, 0, 0, 0);
+	          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	          gl.lastViewport = null;
+
+	          var ev = new CustomEvent('glCleared', {});
+	          _this2.refs.canvas.dispatchEvent(ev);
+	        };
+
+	        document.addEventListener('splitterResize', function (ev) {
+	          requestAnimationFrame(repaint);
+	        });
+	        window.addEventListener('resize', function (ev) {
+	          requestAnimationFrame(repaint);
+	        });
+	      });
+	      /*Module = {
+	        canvas,
 	        keyboardListeningElement: canvas,
-
-	        'onRuntimeInitialized': function onRuntimeInitialized() {
-	          Bindings.initGL = Module.cwrap('initGL', 'number', ['number', 'number']);
-	          Bindings.drawTriangle = Module.cwrap('drawTriangle', 'number', []);
-	          Bindings.clearGL = Module.cwrap('clearGL', 'number', []);
-	          Bindings.resizeGL = Module.cwrap('resizeGL', 'number', ['number', 'number']);
-	          Bindings.scissorViewport = Module.cwrap('scissorViewport', 'number', ['number', 'number', 'number', 'number']);
+	         'onRuntimeInitialized': () => {
+	          Bindings.initGL = Module.cwrap('initGL', 'number', ['number', 'number'])
+	          Bindings.drawTriangle = Module.cwrap('drawTriangle', 'number', [])
+	          Bindings.clearGL = Module.cwrap('clearGL', 'number', [])
+	          Bindings.resizeGL = Module.cwrap('resizeGL', 'number', ['number', 'number'])
+	          Bindings.scissorViewport = Module.cwrap('scissorViewport', 'number', ['number', 'number', 'number', 'number'])
 	          if (!Bindings.initGL(document.body.clientWidth, document.body.clientHeight)) {
-	            return;
+	            return
 	          }
-	          gl = Module.canvas.GLctxObject.GLctx;
-
-	          _this2.props.dispatch((0, _actions.initGL)(gl, Module, Bindings));
-	          onGLInitialized({ gl: gl, Module: Module, Bindings: Bindings });
-
-	          var repaint = function repaint() {
-	            _this2.setState({
+	          gl = Module.canvas.GLctxObject.GLctx
+	           this.props.dispatch(initGL(gl, Module, Bindings))
+	          onGLInitialized({gl, Module, Bindings})
+	           let repaint = () => {
+	            this.setState({
 	              width: document.body.clientWidth,
 	              height: document.body.clientHeight
-	            });
-
-	            gl.disable(gl.SCISSOR_TEST);
-	            gl.clearColor(0, 0, 0, 0);
-	            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	            gl.lastViewport = null;
-
-	            var ev = new CustomEvent('glCleared', {});
-	            _this2.refs.canvas.dispatchEvent(ev);
-	          };
-
-	          document.addEventListener('splitterResize', function (ev) {
-	            requestAnimationFrame(repaint);
-	          });
-	          window.addEventListener('resize', function (ev) {
-	            requestAnimationFrame(repaint);
-	          });
+	            })
+	             gl.disable(gl.SCISSOR_TEST)
+	            gl.clearColor(0,0,0,0)
+	            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	            gl.lastViewport = null
+	             let ev = new CustomEvent('glCleared', {})
+	            this.refs.canvas.dispatchEvent(ev)
+	          }
+	           document.addEventListener('splitterResize', function(ev) {
+	            requestAnimationFrame(repaint)
+	          })
+	          window.addEventListener('resize', (ev) => {
+	            requestAnimationFrame(repaint)
+	          })
 	        }
-	      };
-
-	      canvasScriptLoaded.then(function (js) {
-	        eval('(function(Module) { ' + js + ' })(Module);');
-	      });
+	      }*/
 	    }
 	  }, {
 	    key: 'render',
@@ -42261,6 +42296,14 @@
 
 	var _propertyField2 = _interopRequireDefault(_propertyField);
 
+	var _superagent = __webpack_require__(277);
+
+	var _superagent2 = _interopRequireDefault(_superagent);
+
+	var _app = __webpack_require__(1);
+
+	var _scene = __webpack_require__(303);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -42280,6 +42323,8 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ParticleSettings).call(this, props));
 
 	    _this.displayName = 'Particle Settings';
+	    _this.fluidContainer = null;
+	    _this.running = false;
 	    return _this;
 	  }
 
@@ -42349,13 +42394,42 @@
 	    }
 	  }, {
 	    key: 'start',
-	    value: function start() {}
+	    value: function start() {
+	      var _this2 = this;
+
+	      _app.runtimeInitialized.then(function () {
+	        if (!_this2.fluidContainer) {
+	          _this2.fluidContainer = _scene.Bindings.initializeFluidContainer(_this2.props.sizeX, _this2.props.sizeY, _this2.props.sizeZ, _this2.props.resolution);
+	          console.log('Created fluid container', _this2.fluidContainer);
+	        }
+	        // Bindings.updateFluidContainer(this.fluidContainer)
+	        // console.log('stepped')
+	        _this2.running = true;
+	        requestAnimationFrame(_this2.step.bind(_this2));
+	      });
+	    }
+	  }, {
+	    key: 'step',
+	    value: function step() {
+	      if (!this.fluidContainer || !this.running) return;
+	      var d = new Date();
+	      _scene.Bindings.updateFluidContainer(this.fluidContainer);
+	      console.log(new Date() - d);
+	      requestAnimationFrame(this.step.bind(this));
+	    }
 	  }, {
 	    key: 'stop',
-	    value: function stop() {}
+	    value: function stop() {
+	      this.running = false;
+	    }
 	  }, {
 	    key: 'reset',
-	    value: function reset() {}
+	    value: function reset() {
+	      if (!this.fluidContainer) return;
+	      console.log('Destroying fluid container', this.fluidContainer);
+	      _scene.Bindings.destroyFluidContainer(this.fluidContainer);
+	      this.fluidContainer = null;
+	    }
 	  }]);
 
 	  return ParticleSettings;
@@ -42623,6 +42697,30 @@
 
 	// exports
 
+
+/***/ },
+/* 298 */,
+/* 299 */,
+/* 300 */,
+/* 301 */,
+/* 302 */,
+/* 303 */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.Bindings = undefined;
+
+	var _app = __webpack_require__(1);
+
+	var Bindings = exports.Bindings = {};
+
+	_app.runtimeInitialized.then(function () {
+	  Bindings.initializeFluidContainer = _app.Module.cwrap('initializeFluidContainer', 'number', ['number', 'number', 'number', 'number']);
+	  Bindings.updateFluidContainer = _app.Module.cwrap('updateFluidContainer', 'number', ['number']);
+	  Bindings.destroyFluidContainer = _app.Module.cwrap('destroyFluidContainer', 'number', ['number']);
+	});
 
 /***/ }
 /******/ ]);
